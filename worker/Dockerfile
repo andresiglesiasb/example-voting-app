@@ -7,19 +7,15 @@
 # for example, if you were on Intel (amd64) and wanted to build for ARM, you would use:
 # docker buildx build --platform "linux/arm64/v8" .
 
-# build compiles the program for the builder's local platform
-FROM --platform=${BUILDPLATFORM} mcr.microsoft.com/dotnet/sdk:7.0 AS build
-ARG TARGETPLATFORM
-ARG TARGETARCH
-ARG BUILDPLATFORM
-RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM"
+# build compiles the program for amd64 (legacy builder, no BuildKit multi-platform)
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 
 WORKDIR /source
 COPY *.csproj .
-RUN dotnet restore -a $TARGETARCH
+RUN dotnet restore -a amd64
 
 COPY . .
-RUN dotnet publish -c release -o /app -a $TARGETARCH --self-contained false --no-restore
+RUN dotnet publish -c release -o /app -a amd64 --self-contained false --no-restore
 
 # app image
 FROM mcr.microsoft.com/dotnet/runtime:7.0

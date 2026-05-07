@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', DOCKERHUB_CREDS) {
-                        def img = docker.build("${DOCKERHUB_USER}/worker:${VERSION}", "--build-arg BUILDPLATFORM=linux/amd64 --build-arg TARGETPLATFORM=linux/amd64 --build-arg TARGETARCH=amd64 ./worker")
+                        def img = docker.build("${DOCKERHUB_USER}/worker:${VERSION}", "./worker")
                         img.push()
                     }
                     sh "docker rmi ${DOCKERHUB_USER}/worker:${VERSION}"
