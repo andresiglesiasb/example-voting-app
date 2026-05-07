@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER  = '<YOUR_DOCKERHUB_USER>'
+        DOCKERHUB_USER  = 'andresiglesiasbarbara'
         DOCKERHUB_CREDS = 'dockerhub-credentials'           // Credential ID from step A1
-        GITOPS_REPO     = 'git@github.com:<YOUR_USER>/example-voting-app-gitops.git'
+        GITOPS_REPO     = 'git@github.com:andresiglesiasb/example-voting-app-gitops.git'
         GITOPS_CREDS    = 'github-gitops-ssh'               // Credential ID from step A2
         VERSION         = "v1.0.${BUILD_NUMBER}"            // e.g. v1.0.1, v1.0.2 ...
     }
