@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER  = 'andresiglesiasb'
+        DOCKERHUB_USER  = 'andresiglesiasbarbara'
         DOCKERHUB_CREDS = 'dockerhub-credentials'
         GITOPS_REPO     = 'git@github.com:andresiglesiasb/example-voting-app-gitops.git'
         GITOPS_CREDS    = 'github-gitops-ssh'
