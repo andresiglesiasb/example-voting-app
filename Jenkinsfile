@@ -49,15 +49,10 @@ pipeline {
 
         stage('Update GitOps repo') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: GITOPS_CREDS, keyFileVariable: 'SSH_KEY')]) {
-                    // single quotes: shell resolves $SSH_KEY, Groovy never touches it
-                    sh 'cp "$SSH_KEY" /tmp/gitops_key && chmod 600 /tmp/gitops_key'
-                    // double quotes: Groovy resolves VERSION, DOCKERHUB_USER, GITOPS_REPO
+                sshagent([GITOPS_CREDS]) {
                     sh """
-                        export GIT_SSH_COMMAND="ssh -i /tmp/gitops_key -o StrictHostKeyChecking=no"
-
                         rm -rf gitops-tmp
-                        git clone ${GITOPS_REPO} gitops-tmp
+                        GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone ${GITOPS_REPO} gitops-tmp
                         cd gitops-tmp
 
                         sed -i 's|image: ${DOCKERHUB_USER}/vote:.*|image: ${DOCKERHUB_USER}/vote:${VERSION}|'     vote-deployment.yaml
@@ -68,9 +63,8 @@ pipeline {
                         git config user.name "Jenkins"
                         git add vote-deployment.yaml result-deployment.yaml worker-deployment.yaml
                         git commit -m "ci: bump image tags to ${VERSION} [build #${BUILD_NUMBER}]"
-                        git push origin main
+                        GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git push origin main
                     """
-                    sh 'rm -f /tmp/gitops_key'
                 }
             }
         }
