@@ -50,8 +50,11 @@ pipeline {
         stage('Update GitOps repo') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: GITOPS_CREDS, keyFileVariable: 'SSH_KEY')]) {
+                    // single quotes: shell resolves $SSH_KEY, Groovy never touches it
+                    sh 'cp "$SSH_KEY" /tmp/gitops_key && chmod 600 /tmp/gitops_key'
+                    // double quotes: Groovy resolves VERSION, DOCKERHUB_USER, GITOPS_REPO
                     sh """
-                        export GIT_SSH_COMMAND="ssh -i \${SSH_KEY} -o StrictHostKeyChecking=no"
+                        export GIT_SSH_COMMAND="ssh -i /tmp/gitops_key -o StrictHostKeyChecking=no"
 
                         rm -rf gitops-tmp
                         git clone ${GITOPS_REPO} gitops-tmp
@@ -67,6 +70,7 @@ pipeline {
                         git commit -m "ci: bump image tags to ${VERSION} [build #${BUILD_NUMBER}]"
                         git push origin main
                     """
+                    sh 'rm -f /tmp/gitops_key'
                 }
             }
         }
