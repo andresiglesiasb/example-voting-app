@@ -49,8 +49,10 @@ pipeline {
 
         stage('Update GitOps repo') {
             steps {
-                sshagent([GITOPS_CREDS]) {
+                withCredentials([sshUserPrivateKey(credentialsId: GITOPS_CREDS, keyFileVariable: 'SSH_KEY')]) {
                     sh """
+                        export GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no"
+
                         rm -rf gitops-tmp
                         git clone ${GITOPS_REPO} gitops-tmp
                         cd gitops-tmp
